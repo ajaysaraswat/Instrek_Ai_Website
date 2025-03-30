@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -12,6 +12,42 @@ const Navbar = () => {
     { name: "Strengths", href: "#strengths" },
     { name: "Contact", href: "#contact" },
   ];
+
+  // Close mobile menu when window resizes to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isOpen]);
+
+  // Function to handle smooth scrolling
+  const scrollToSection = (elementId) => {
+    const element = document.getElementById(elementId.substring(1));
+    if (element) {
+      // Get the position of the element relative to the viewport
+      const yOffset = -80; // Adjust this value based on your navbar height
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      // Scroll to the calculated position
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  // Handle mobile and desktop navigation
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    setIsOpen(false); // Close mobile menu
+
+    // Extract ID without the #
+    const sectionId = href;
+    scrollToSection(sectionId);
+  };
 
   return (
     <nav className="fixed w-full bg-white/80 backdrop-blur-md z-50 shadow-sm">
@@ -28,7 +64,6 @@ const Navbar = () => {
               </span>
             </motion.div>
           </div>
-
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
@@ -38,6 +73,7 @@ const Navbar = () => {
                 className="text-gray-600 hover:text-primary-600 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.name}
               </motion.a>
@@ -45,12 +81,11 @@ const Navbar = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-primary-600 text-white px-6 py-2 rounded-full hover:bg-primary-700 transition-colors"
+              className="bg-primary-600 text-black px-6 py-2 rounded-full hover:bg-primary-700 transition-colors"
             >
               Get Started
             </motion.button>
           </div>
-
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
@@ -66,31 +101,26 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-
       {/* Mobile Navigation */}
-      <motion.div
-        initial={false}
-        animate={
-          isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }
-        }
-        className="md:hidden"
-      >
-        <div className="px-4 pt-2 pb-3 space-y-1">
-          {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
-            >
-              {item.name}
-            </a>
-          ))}
-          <button className="w-full bg-primary-600 text-white px-6 py-2 rounded-full hover:bg-primary-700 transition-colors">
-            Get Started
-          </button>
+      {isOpen && (
+        <div className="md:hidden">
+          <div className="px-4 pt-2 pb-3 space-y-1 bg-white shadow-lg">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                onClick={(e) => handleNavClick(e, item.href)}
+              >
+                {item.name}
+              </a>
+            ))}
+            <button className="w-full text-black px-6 py-2 rounded-full hover:bg-primary-700 hover:text-white transition-colors">
+              Get Started
+            </button>
+          </div>
         </div>
-      </motion.div>
+      )}
     </nav>
   );
 };

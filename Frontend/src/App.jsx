@@ -13,12 +13,18 @@ function App() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <main>
-        <Hero />
+        <section id="home">
+          <Hero />
+        </section>
         <CompanyOverview />
-        <Strengths />
+        <section id="strengths">
+          <Strengths />
+        </section>
         <Services />
         <WhyChooseUs />
-        <CallToAction />
+        <section id="contact">
+          <CallToAction />
+        </section>
       </main>
       <Footer />
     </div>
